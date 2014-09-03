@@ -1,0 +1,37 @@
+{
+  "name": "mongoo",
+  "description": "plugins, helpers, and other goodies for mongodb and mongoose",
+  "version": "0.0.1",
+  "homepage": "https://github.com/sackio/mongoo",
+  "author": {
+    "name": "Ben Sack",
+    "email": "ben@sack.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sackio/mongoo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sackio/mongoo/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/sackio/mongoo/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/mongoo",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt": "~0.4.5"
+  },
+  "keywords": []
+}
