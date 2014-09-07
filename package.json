@@ -33,5 +33,16 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt": "~0.4.5"
   },
+  "dependencies": {
+    "mongoose": "3.8.15"
+  , "underscore": "*"
+  , "async": "*"
+  , "jsbelt": "*"
+  , "fstk": "*"
+  , "optionall": "*"
+  , "moment": "*"
+  , "bcrypt": "*"
+  , "solr": "git://github.com/sackio/solr-node-client.git"
+  },
   "keywords": []
 }

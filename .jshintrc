@@ -1,14 +1,16 @@
 {
-  "curly": true,
+  "curly": false,
   "eqeqeq": true,
   "immed": true,
   "latedef": "nofunc",
-  "newcap": true,
+  "newcap": false,
   "noarg": true,
   "sub": true,
   "undef": true,
-  "unused": true,
+  "unused": false,
   "boss": true,
   "eqnull": true,
+  "laxcomma": true,
+  "laxbreak": true,
   "node": true
 }
