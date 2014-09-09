@@ -43,6 +43,8 @@
   , "moment": "*"
   , "bcrypt": "*"
   , "solr": "git://github.com/sackio/solr-node-client.git"
+  , "request": "*"
+  , "locup": "*"
   },
   "keywords": []
 }

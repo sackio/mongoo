@@ -458,6 +458,169 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        Globals.schema14 = new Mongoose.Schema({});
+        Globals.schema14.plugin(Mongoo.plugins.location_path, {'path': 'location', 'api_key': O.google.server_api_key});
+        Globals.model = Globals.mongoose.model('model14', Globals.schema14);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'location': {'given_string': 'Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France'}}, function(err, doc){
+          test.ok(!err);
+
+          test.ok(doc.get('location.normalized_string') === '5 Avenue Anatole France, 75007 Paris, France');
+          test.ok(doc.get('location.geo.coordinates').length === 2);
+          test.ok(doc.get('location.address.city') === 'Paris');
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'location': {'given_string': 'Eiffel Tower'}}, function(err, doc){
+          test.ok(!err);
+
+          test.ok(doc.get('location.normalized_string') === 'Eiffel Tower, Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France');
+          test.ok(doc.get('location.geo.coordinates').length === 2);
+          test.ok(doc.get('location.address.city') === 'Paris');
+          test.ok(doc.get('location.address.point_of_interest') === 'Eiffel Tower');
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'location': {'geo': {'type': 'Point', 'coordinates': [-77.036530, 38.897676]}}}, function(err, doc){
+          test.ok(!err);
+
+          test.ok(doc.get('location.normalized_string') === '1600 Pennsylvania Avenue Northwest, Washington, DC 20500, USA');
+          test.ok(doc.get('location.geo.coordinates').length === 2);
+          test.ok(doc.get('location.address.city') === 'Washington');
+          test.ok(doc.get('location.address.state') === 'District of Columbia');
+          test.ok(doc.get('location.address.zip') === '20500');
+
+          test.ok(doc.normalize_address('location') === '1600, Pennsylvania Avenue Northwest, Washington, District of Columbia, United States, 20500');
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'location': {'geo': {'type': 'Point', 'coordinates': [-77.036530, 38.897676]}}}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.set('location.address.zip', null);
+        Globals.obj = Globals.doc.toObject();
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(!Globals.doc.get('location.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        Globals.doc.set('location.given_string', '50 Park Avenue, New York, NY');
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(!Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(Globals.doc.get('location.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'location': {'geo': {'type': 'Point', 'coordinates': [-77.036530, 38.897676]}}}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.set('location.address.zip', null);
+        Globals.obj = Globals.doc.toObject();
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(!Globals.doc.get('location.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        Globals.doc.set('location.geo.coordinates', [-73.985656, 40.748433]);
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(!Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(Globals.doc.get('location.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        Globals.schema15 = new Mongoose.Schema({});
+        Globals.schema15.plugin(Mongoo.plugins.location_path, {'path': 'location', 'api_key': O.google.server_api_key, 'array': true});
+        Globals.model = Globals.mongoose.model('model15', Globals.schema15);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'location': [
+          {'geo': {'type': 'Point', 'coordinates': [-77.036530, 38.897676]}}
+        , {'given_string': 'Eiffel Tower'}
+        , {'given_string': '50 Park Avenue, New York, NY'}
+        ]}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        var doc = Globals.doc;
+
+        test.ok(doc.get('location.0.normalized_string') === '1600 Pennsylvania Avenue Northwest, Washington, DC 20500, USA');
+        test.ok(doc.get('location.0.geo.coordinates').length === 2);
+        test.ok(doc.get('location.0.address.city') === 'Washington');
+        test.ok(doc.get('location.0.address.state') === 'District of Columbia');
+        test.ok(doc.get('location.0.address.zip') === '20500');
+        test.ok(doc.normalize_address('location.0') === '1600, Pennsylvania Avenue Northwest, Washington, District of Columbia, United States, 20500');
+        test.ok(doc.get('location.1.normalized_string') === 'Eiffel Tower, Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France');
+        test.ok(doc.get('location.1.geo.coordinates').length === 2);
+        test.ok(doc.get('location.1.address.city') === 'Paris');
+        test.ok(doc.get('location.1.address.point_of_interest') === 'Eiffel Tower');
+        test.ok(doc.get('location.2.normalized_string') === '50 Park Avenue, New York, NY 10016, USA');
+
+        return cb();
+      }
+    , function(cb){
+        Globals.doc.set('location.2.address.zip', null);
+        Globals.doc.set('location.1.address.zip', null);
+        Globals.obj = Globals.doc.toObject();
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(!Globals.doc.get('location.2.address.zip'));
+        test.ok(!Globals.doc.get('location.1.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        Globals.doc.set('location.2.geo.coordinates', [-73.985656, 40.748433]);
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(!Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(Globals.doc.get('location.2.address.zip'));
+        test.ok(!Globals.doc.get('location.1.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        Globals.doc.set('location.2.address.zip', null);
+        Globals.doc.set('location.1.address.zip', null);
+        Globals.obj = Globals.doc.toObject();
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(!Globals.doc.get('location.2.address.zip'));
+        test.ok(!Globals.doc.get('location.1.address.zip'));
+        return cb();
+      }
+    , function(cb){
+        Globals.doc.set('location.1.given_string', '50 Park Avenue, New York, NY');
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(!Belt.deepEqual(Globals.doc.toObject(), Globals.obj));
+        test.ok(Globals.doc.get('location.1.address.zip'));
+        test.ok(!Globals.doc.get('location.2.address.zip'));
+        return cb();
+      }
+
+    , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
     , function(cb){
