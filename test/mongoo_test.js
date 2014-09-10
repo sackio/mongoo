@@ -5,8 +5,10 @@ var Mongoo = require('../lib/mongoo.js')
   , Path = require('path')
   , Util = require('util')
   , Moment = require('moment')
+  , FSTK = require('fstk')
   , Async = require('async')
   , Belt = require('jsbelt')
+  , OS = require('os')
   , _ = require('underscore')
   , Optionall = require('optionall')
   , O = new Optionall();
@@ -619,7 +621,249 @@ exports['plugins'] = {
         test.ok(!Globals.doc.get('location.2.address.zip'));
         return cb();
       }
+    , function(cb){
+        Globals.schema16 = new Mongoose.Schema({});
+        Globals.schema16.plugin(Mongoo.plugins.file_path, {'path': 'image'});
+        Globals.model = Globals.mongoose.model('model16', Globals.schema16);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        test.ok(Globals.doc);
+        test.ok(!Globals.doc.get('image.stat'));
+        test.ok(!Globals.doc.get('image.file_path'));
 
+        return cb();
+      }
+    , function(cb){
+        Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+        return Globals.model.create({image: {file_path: Globals.path}}
+               , Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        test.ok(Globals.doc.get('image.file_path') === Globals.path);
+        test.ok(Globals.doc.get('image.stat.path') === Globals.path);
+        return FSTK.exists(Globals.doc.get('image.file_path'), function(exists){
+          test.ok(exists);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.doc.remove(Belt.cw(function(err){ return setTimeout(cb, 3000); }, 0));
+      }
+    , function(cb){
+        return FSTK.exists(Globals.path, function(exists){
+          test.ok(!exists);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+        return Globals.model.create({image: {file_path: Globals.path}}
+               , Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        return Globals.doc.watch_file('image', Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(Globals.doc.get('image').__watcher);
+        Globals.stat = Belt.deepCopy(Globals.doc.get('image.stat'));
+        test.ok(Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));
+
+        return Globals.doc.get('image').__watcher.set('this is a test file', Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));
+        return cb();
+      }
+    , function(cb){
+        Globals.stat = Belt.deepCopy(Globals.doc.get('image.stat'));
+        test.ok(Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));
+
+        return FSTK.writeFile(Globals.doc.get('image.file_path'), 'changing the file', function(err){
+          return setTimeout(function(){ return cb(err); }, 3000);
+        });
+      }
+    , function(cb){
+        test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));
+        Globals.stat = Belt.deepCopy(Globals.doc.get('image.stat'));
+        Globals.doc.get('image.stat').isFile = false;
+        test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(Globals.doc.get('image.stat.isFile'));
+        return cb();
+      }
+    , function(cb){
+        Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+        Globals.doc.set('image.file_path', Globals.path);
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        return FSTK.exists(Globals.path, function(exists){
+          test.ok(exists);
+          test.ok(Globals.doc.get('image.file_path') === Globals.path);
+          test.ok(Globals.doc.get('image.stat.path') === Globals.path);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.stat = Belt.deepCopy(Globals.doc.get('image.stat'));
+        return Globals.doc.update_ftimes('image', function(err){
+          test.ok(!err);
+          /*return setTimeout(function(){
+            return Globals.doc.stat_file('image', function(){
+              test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));*/
+              return cb();
+            //});
+          //}, 3000);
+        });
+      }
+    , function(cb){
+        Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+        return Globals.doc.set_file('image', Globals.path, Belt.cw(cb, 0));
+      }
+    , function(cb){
+        return FSTK.exists(Globals.path, function(exists){
+          test.ok(exists);
+          test.ok(Globals.doc.get('image.file_path') === Globals.path);
+          test.ok(Globals.doc.get('image.stat.path') === Globals.path);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema17 = new Mongoose.Schema({});
+        Globals.schema17.plugin(Mongoo.plugins.file_path, {'path': 'images', 'array': true});
+        Globals.model = Globals.mongoose.model('model17', Globals.schema17);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        test.ok(Globals.doc);
+        test.ok(!_.any(Globals.doc.get('images')));
+
+        return cb();
+      }
+    , function(cb){
+        Globals.paths = [
+          Path.join(OS.tmpdir(), '/' + Belt.uuid())
+        , Path.join(OS.tmpdir(), '/' + Belt.uuid())
+        , Path.join(OS.tmpdir(), '/' + Belt.uuid())
+        , Path.join(OS.tmpdir(), '/' + Belt.uuid())
+        ];
+
+        return Globals.model.create({'images': _.map(Globals.paths, function(p){ return {'file_path': p}; })}
+               , Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        var index = 0;
+
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          test.ok(Globals.doc.get('images.' + (index - 1) + '.file_path') === p);
+          test.ok(Globals.doc.get('images.' + (index - 1) + '.stat.path') === p);
+          return FSTK.exists(Globals.doc.get('images.' + (index - 1) + '.file_path'), function(exists){
+            test.ok(exists);
+            return _cb();
+          });
+        }, Belt.cw(cb, 0));
+      }
+    , function(cb){
+        var index = 0;
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          return Globals.doc.watch_file('images.' + (index - 1), Belt.cw(cb, 0));
+        }, Belt.cw(cb, 0));
+      }
+    , function(cb){
+        var index = 0;
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          test.ok(Globals.doc.get('images.' + (index -1)).__watcher);
+          Globals.stat = Belt.deepCopy(Globals.doc.get('images.' + (index - 1) + '.stat'));
+          test.ok(Globals.stat);
+          test.ok(Belt.deepEqual(Globals.stat, Globals.doc.get('images.' + (index - 1) + '.stat')));
+          return Globals.doc.get('images.' + (index - 1)).__watcher.set('this is a test file', function(err){
+            test.ok(!err);
+            test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('images.' + (index - 1) + '.stat')));
+            return cb();
+          });
+        }, Belt.cw(cb, 0));
+      }
+    , function(cb){
+        var index = 0;
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          Globals.stat = Belt.deepCopy(Globals.doc.get('images.' + (index - 1) + '.stat'));
+          test.ok(Belt.deepEqual(Globals.stat, Globals.doc.get('images.' + (index - 1) + '.stat')));
+
+          return FSTK.writeFile(Globals.doc.get('images.' + (index - 1) + '.file_path'), 'changing the file', function(err){
+            test.ok(!err);
+            return setTimeout(function(){ 
+              //test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('images.' + (index - 1) + '.stat')));
+              //Globals.stat = Belt.deepCopy(Globals.doc.get('images.' + (index - 1) + '.stat'));
+              Globals.doc.get('images.' + (index - 1) + '.stat').isFile = false;
+              test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('images.' + (index - 1) + '.stat')));
+              return Globals.doc.save(function(err){
+                test.ok(!err);
+                test.ok(Globals.doc.get('images.' + (index - 1) + '.stat.isFile'));
+                return _cb();
+              });
+            }, 3000);
+          });
+        }, Belt.cw(cb, 0));
+      }
+    , function(cb){
+        var index = 0;
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          Globals.paths[index - 1] = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+          Globals.doc.set('images.' + (index - 1) + '.file_path', Globals.paths[index - 1]);
+          return Globals.doc.save(function(err){
+            if (err) return _cb(err);
+            return FSTK.exists(Globals.paths[index - 1], function(exists){
+              test.ok(exists);
+              test.ok(Globals.doc.get('images.' + (index - 1) + '.file_path') === Globals.paths[index - 1]);
+              test.ok(Globals.doc.get('images.' + (index - 1) + '.stat.path') === Globals.paths[index - 1]);
+              return cb();
+            });
+          });
+        });
+      }
+    , function(cb){
+        var index = 0;
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          Globals.paths[index - 1] = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+          Globals.doc.set_file('images.' + (index - 1), Globals.paths[index - 1], function(err){
+            if (err) return _cb(err);
+            return FSTK.exists(Globals.paths[index - 1], function(exists){
+              test.ok(exists);
+              test.ok(Globals.doc.get('images.' + (index - 1) + '.file_path') === Globals.paths[index - 1]);
+              test.ok(Globals.doc.get('images.' + (index - 1) + '.stat.path') === Globals.paths[index - 1]);
+              return cb();
+            });
+          });
+        });
+      }
+    , function(cb){
+        return Globals.doc.remove(Belt.cw(function(err){ return setTimeout(cb, 3000); }, 0));
+      }
+    , function(cb){
+        var index = 0;
+        return Async.eachSeries(Globals.paths, function(p, _cb){
+          index++;
+          return FSTK.exists(Globals.doc.get('images.' + (index - 1) + '.file_path'), function(exists){
+            test.ok(!exists);
+            return _cb();
+          });
+        }, Belt.cw(cb, 0));
+      }
     , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
