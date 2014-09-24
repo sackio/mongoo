@@ -11,7 +11,9 @@ var Mongoo = require('../lib/mongoo.js')
   , OS = require('os')
   , _ = require('underscore')
   , Optionall = require('optionall')
-  , O = new Optionall();
+  , O = new Optionall()
+  , Solrdex = new require('solrdex')()
+;
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -863,6 +865,113 @@ exports['plugins'] = {
             return _cb();
           });
         }, Belt.cw(cb, 0));
+      }
+    , function(cb){
+        return Solrdex.delete('*', Belt.cw(cb, 0));
+      }
+    , function(cb){
+        Globals.schema18 = new Mongoose.Schema({'description': String});
+        Globals.schema18.plugin(Mongoo.plugins.solr, {'path': 'description'});
+        Globals.model = Globals.mongoose.model('model18', Globals.schema18);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'description': 'It was the best of times, it was the worst of times'}
+               , Belt.cs(cb, Globals, 'doc_a', 1, 0));
+      }
+    , function(cb){
+        return Globals.model.create({'description': 'All the world\'s a stage'}
+               , Belt.cs(cb, Globals, 'doc_b', 1, 0));
+      }
+    , function(cb){
+        return Globals.model.create({'description': 'Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune'}
+               , Belt.cs(cb, Globals, 'doc_c', 1, 0));
+      }
+    , function(cb){
+        return Globals.model.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_a.get('_id')));
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.solrSearch('wurst bezt slings', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_a.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_c.get('_id')));
+        return cb();
+      }
+    , function(cb){
+        Globals.schema19 = new Mongoose.Schema({'description': String});
+        Globals.schema19.plugin(Mongoo.plugins.solr, {'path': 'description'});
+        Globals.modelb = Globals.mongoose.model('model19', Globals.schema19);
+        return cb();
+      }
+    , function(cb){
+        return Globals.modelb.create({'description': 'It was the best of times, it was the worst of times'}
+               , Belt.cs(cb, Globals, 'doc_1', 1, 0));
+      }
+    , function(cb){
+        return Globals.modelb.create({'description': 'All the world\'s a stage'}
+               , Belt.cs(cb, Globals, 'doc_2', 1, 0));
+      }
+    , function(cb){
+        return Globals.modelb.create({'description': 'Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune'}
+               , Belt.cs(cb, Globals, 'doc_3', 1, 0));
+      }
+    , function(cb){
+        return Globals.modelb.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
+        test.ok(Globals.results.length === 1);
+        return cb();
+      }
+    , function(cb){
+        return Globals.modelb.solrSearch('wurst bezt slings', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_3.get('_id')));
+        test.ok(Globals.results.length === 2);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_a.get('_id')));
+        test.ok(Globals.results.length === 1);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.solrSearch('wurst bezt slings', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_a.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_c.get('_id')));
+        test.ok(Globals.results.length === 2);
+        return cb();
+      }
+    , function(cb){
+        return Solrdex.getById(Globals.doc_a.get('_id'), Belt.cs(cb, Globals, 'solrdoc', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.solrdoc[0].model_s, 'model18'));
+        test.ok(Belt.deepEqual(Globals.solrdoc[0].id, Globals.doc_a.get('_id').toString()));
+        test.ok(Belt.deepEqual(Globals.solrdoc[0].description_en[0], Globals.doc_a.get('description')));
+        return cb();
+      }
+    , function(cb){
+        return Globals.doc_a.remove(function(){ return setTimeout(cb, 1000); });
+      }
+    , function(cb){
+        return Solrdex.getById(Globals.doc_a.get('_id'), Belt.cs(cb, Globals, 'solrdoc', 1, 0));
+      }
+    , function(cb){
+        test.ok(!_.any(Belt.deepEqual(Globals.solrdoc)));
+        return cb();
       }
     , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));

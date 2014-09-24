@@ -42,9 +42,10 @@
   , "optionall": "*"
   , "moment": "*"
   , "bcrypt": "*"
-  , "solr": "git://github.com/sackio/solr-node-client.git"
+  , "solrdex": "*"
   , "request": "*"
   , "locup": "*"
+  , "rol": "*"
   },
   "keywords": []
 }
