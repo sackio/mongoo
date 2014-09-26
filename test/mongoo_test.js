@@ -974,6 +974,65 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        Globals.schema20 = new Mongoose.Schema({'description': String});
+        Globals.schema20.plugin(Mongoo.plugins.access_control);
+        Globals.model = Globals.mongoose.model('model20', Globals.schema20);
+        return cb();
+      }
+    , function(cb){
+        Globals.model.acAddRule({
+          'selector': /find/
+        , 'handler': function(acObj, methObj, cb){
+             if (cb) return cb('I can\'t let you do that dave');
+             return 'I can\'t let you do that dave';
+          }
+        });
+
+        test.ok(Globals.model.ac(null, 'find', [{'_id': true}]) === 'I can\'t let you do that dave');
+
+        return Globals.model.ac(null, 'find', [{'_id': true}, function(err){
+          test.ok(err === 'I can\'t let you do that dave');
+
+          return cb();
+        }]);
+      }
+    , function(cb){
+        test.ok(Globals.model.ac(null, 'modelName') === 'model20');
+        Globals.model.acAddRule({
+          'selector': 'modelName'
+        , 'label': 'gonzo'
+        , 'handler': function(acObj, methObj, cb){
+             return 'gonzo';
+          }
+        });
+        test.ok(Globals.model.ac(null, 'modelName') === 'gonzo');
+        Globals.model.acRemoveRule('gonzo');
+        test.ok(Globals.model.ac(null, 'modelName') === 'model20');
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'description': 'this is a document'}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.acAddRule({
+          'selector': 'get'
+        , 'handler': function(acObj, methObj, cb){
+             if (methObj.args[0] === 'description') return;
+             return 'gonzo';
+          }
+        });
+
+        test.ok(Globals.doc.ac({}, 'get', ['description']) === Globals.doc.get('description'));
+        test.ok(Globals.doc.ac({}, 'get', ['password']) === 'gonzo');
+        return cb();
+      }
+    , function(cb){
+        Globals.interface = Globals.doc.mediator();
+
+        test.ok(Globals.interface.get('password') === 'gonzo');
+        return cb();
+      }
+    , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
     , function(cb){
