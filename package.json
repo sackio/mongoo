@@ -1,6 +1,6 @@
 {
   "name": "mongoo",
-  "description": "plugins, helpers, and other goodies for mongodb and mongoose",
+  "description": "A collection of essential plugins and utilities for working with MongoDB and Mongoose",
   "version": "0.0.1",
   "homepage": "https://github.com/sackio/mongoo",
   "author": {
@@ -46,6 +46,7 @@
   , "request": "*"
   , "locup": "*"
   , "rol": "*"
+  , "timely": "*"
   },
   "keywords": []
 }
