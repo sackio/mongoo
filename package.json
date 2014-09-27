@@ -47,6 +47,8 @@
   , "locup": "*"
   , "rol": "*"
   , "timely": "*"
+  , "mongodb": "*"
+  , "seme": "git://github.com/sackio/seme.git#master"
   },
   "keywords": []
 }

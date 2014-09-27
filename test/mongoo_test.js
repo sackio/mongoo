@@ -867,7 +867,8 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }
     , function(cb){
-        return Solrdex.delete('*', Belt.cw(cb, 0));
+        return Mongoo.utils.clearSolr(Belt.cw(cb, 0));
+        //return Solrdex.delete('*', Belt.cw(cb, 0));
       }
     , function(cb){
         Globals.schema18 = new Mongoose.Schema({'description': String});
@@ -1048,6 +1049,9 @@ exports['plugins'] = {
     , function(cb){
         test.ok(!_.any(Globals.docs));
         return cb();
+      }
+    , function(cb){
+        return Mongoo.utils.dropDB(O.mongodb.db, O.mongodb, Belt.cw(cb, 0));
       }
     ], function(err){
       if (err) console.error(err);
