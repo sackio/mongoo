@@ -44,7 +44,7 @@ exports['plugins'] = {
     Globals.mongoose = Mongoose.createConnection(Globals.mongo_connection);
     done();
   }
-, 'tests': function(test){
+, 'plugins': function(test){
     return Async.waterfall([
       function(cb){
         Globals.schema = new Mongoose.Schema({
@@ -1033,6 +1033,230 @@ exports['plugins'] = {
         test.ok(Globals.interface.get('password') === 'gonzo');
         return cb();
       }
+    , function(cb){
+        Globals.schema21 = new Mongoose.Schema({
+          'links': [{'label': String, 'url': {type: String, required: true}}]
+        });
+        Globals.schema21.plugin(Mongoo.plugins.url_path, {'array_path': 'links', 'path': 'url'});
+        Globals.model = Globals.mongoose.model('model21', Globals.schema21);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'links': [{'label': 'not a url'}]}, function(err){
+          test.ok(err);
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.get('links').push({'url': 'https://reddit.com'});
+        return Globals.doc.save(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        Globals.doc.get('links').push({'url': 'not a url'});
+        return Globals.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema22 = new Mongoose.Schema({
+          'phones': [{'label': String, 'number': {type: String, required: true}}]
+        });
+        Globals.schema22.plugin(Mongoo.plugins.phone_path, {'array_path': 'phones', 'path': 'number'});
+        Globals.model = Globals.mongoose.model('model22', Globals.schema22);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'phones': [{'label': 'not a number'}]}, function(err){
+          test.ok(err);
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.get('phones').push({'number': '3212320202'});
+        return Globals.doc.save(function(err, doc){
+          test.ok(!err);
+          test.ok(doc.get('phones.0._id'));
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.doc.get('phones').push({'number': 'not a number'});
+        return Globals.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema23 = new Mongoose.Schema({
+          'emails': [{'label': String, 'email': {type: String, required: true}}]
+        });
+        Globals.schema23.plugin(Mongoo.plugins.email_path, {'array_path': 'emails', 'path': 'email'});
+        Globals.model = Globals.mongoose.model('model23', Globals.schema23);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'emails': [{'label': 'not a number'}]}, function(err){
+          test.ok(err);
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.get('emails').push({'email': 'atest@site.io'});
+        return Globals.doc.save(function(err, doc){
+          test.ok(!err);
+          test.ok(doc.get('emails.0._id'));
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.doc.get('emails').push({'email': 'not a number'});
+        return Globals.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema24 = new Mongoose.Schema({
+          'label': String
+        , 'email': {type: String, required: true}
+        });
+        Globals.schema24.plugin(Mongoo.plugins.email_path, {'path': 'email', 'existing_path': true});
+        Globals.schema25 = new Mongoose.Schema({
+          'emails': [Globals.schema24]
+        });
+        Globals.model = Globals.mongoose.model('model25', Globals.schema25);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'emails': [{'label': 'not a number'}]}, function(err, doc){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({}, Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.doc.get('emails').push({'email': 'atest@site.io'});
+        return Globals.doc.save(function(err, doc){
+          test.ok(!err);
+          test.ok(doc.get('emails.0._id'));
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.doc.get('emails').push({'email': 'not a number'});
+        return Globals.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.doc.get('emails').push({'label': 'not a number'});
+        return Globals.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema26 = new Mongoose.Schema({'description': String});
+        Globals.schema26.plugin(Mongoo.plugins.solr, {'path': 'description', 'model_name': 'model27_file_description'});
+        Globals.schema27 = new Mongoose.Schema({'files': [Globals.schema26]});
+        Globals.schema27.plugin(Mongoo.plugins.solr, {'search_only': true, 'model_name': 'model27_file_description'
+                                                     , 'id_path': 'files._id', 'path': 'description', 'subdoc_path': 'files'});
+        Globals.modelb = Globals.mongoose.model('model27', Globals.schema27);
+        return cb();
+      }
+    , function(cb){
+        return Globals.modelb.create({'files': [{'description': 'It was the best of times, it was the worst of times'}]}
+               , Belt.cs(cb, Globals, 'doc_1', 1, 0));
+      }
+    , function(cb){
+        return Globals.modelb.create({'files': [ {'description': 'All the world\'s a stage'}
+                                               , {'description': 'Out! Out! Life is but a walking shadow'}]}
+               , Belt.cs(cb, Globals, 'doc_2', 1, 0));
+      }
+    , function(cb){
+        return Globals.modelb.create({'files': [{'description': 'Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune'}]}
+               , Belt.cs(cb, Globals, 'doc_3', 1, 0));
+      }
+    , function(cb){
+        return Globals.modelb.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
+        test.ok(Globals.results.length === 1);
+        return cb();
+      }
+    , function(cb){
+        return Globals.modelb.solrSearch('wurst bezt slings', Belt.cs(cb, Globals, 'results', 1, 0));
+      }
+    , function(cb){
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_3.get('_id')));
+        test.ok(Globals.results.length === 2);
+        return cb();
+      }
+    , function(cb){
+        return Globals.modelb.solrSearch('walking shadows', function(err, docs, subdocs){
+          test.ok(docs);
+          test.ok(subdocs);
+          test.ok(subdocs[docs[0].get('_id')][0] === docs[0].get('files.1._id'));
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema28 = new Mongoose.Schema({});
+        Globals.schema28.plugin(Mongoo.plugins.location_path, {'path': 'location', 'api_key': O.google.server_api_key});
+        Globals.schema29 = new Mongoose.Schema({'locations': [Globals.schema28]});
+        Globals.model = Globals.mongoose.model('model29', Globals.schema29);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'locations': [{'location': {'given_string': 'Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France'}}]}, function(err, doc){
+          test.ok(!err);
+
+          test.ok(doc.get('locations.0.location.normalized_string') === '5 Avenue Anatole France, 75007 Paris, France');
+          test.ok(doc.get('locations.0.location.geo.coordinates').length === 2);
+          test.ok(doc.get('locations.0.location.address.city') === 'Paris');
+
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema30 = new Mongoose.Schema({'label': String});
+        Globals.schema30.plugin(Mongoo.plugins.file_path, {'path': 'image'});
+        Globals.schema31 = new Mongoose.Schema({'images': [Globals.schema30]});
+        Globals.model = Globals.mongoose.model('model31', Globals.schema31);
+        return cb();
+      }
+    , function(cb){
+        Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
+        return Globals.model.create({images: [{label: 'test', 'image': {file_path: Globals.path}}]}
+               , Belt.cs(cb, Globals, 'doc', 1, 0));
+      }
+    , function(cb){
+        test.ok(Globals.doc.get('images.0.image.file_path') === Globals.path);
+        test.ok(Globals.doc.get('images.0.image.stat.path') === Globals.path);
+        return FSTK.exists(Globals.doc.get('images.0.image.file_path'), function(exists){
+          test.ok(exists);
+          return cb();
+        });
+      }
+
     , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
