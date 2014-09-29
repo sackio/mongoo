@@ -11,7 +11,7 @@ var Mongoo = require('../lib/mongoo.js')
   , OS = require('os')
   , _ = require('underscore')
   , Optionall = require('optionall')
-  , O = new Optionall()
+  , O = new Optionall(Path.resolve('./'))
   , Solrdex = new require('solrdex')()
 ;
 
