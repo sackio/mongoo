@@ -12,28 +12,8 @@ var Mongoo = require('../lib/mongoo.js')
   , _ = require('underscore')
   , Optionall = require('optionall')
   , O = new Optionall(Path.resolve('./'))
-  , Solrdex = new require('solrdex')()
+  , Solrdex = new require('solrdex')({'commit': true})
 ;
-
-/*
-  ======== A Handy Little Nodeunit Reference ========
-  https://github.com/caolan/nodeunit
-
-  Test methods:
-    test.expect(numAssertions)
-    test.done()
-  Test assertions:
-    test.ok(value, [message])
-    test.equal(actual, expected, [message])
-    test.notEqual(actual, expected, [message])
-    test.deepEqual(actual, expected, [message])
-    test.notDeepEqual(actual, expected, [message])
-    test.strictEqual(actual, expected, [message])
-    test.notStrictEqual(actual, expected, [message])
-    test.throws(block, [error], [message])
-    test.doesNotThrow(block, [error], [message])
-    test.ifError(value)
-*/
 
 var Globals = {
   'mongo_connection': Util.format('mongodb://%s:%s/%s', O.mongodb.host, O.mongodb.port, O.mongodb.db)
@@ -889,6 +869,9 @@ exports['plugins'] = {
                , Belt.cs(cb, Globals, 'doc_c', 1, 0));
       }
     , function(cb){
+        return setTimeout(cb, 5000);
+      }
+    , function(cb){
         return Globals.model.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
       }
     , function(cb){
@@ -905,7 +888,7 @@ exports['plugins'] = {
       }
     , function(cb){
         Globals.schema19 = new Mongoose.Schema({'description': String});
-        Globals.schema19.plugin(Mongoo.plugins.solr, {'path': 'description'});
+        Globals.schema19.plugin(Mongoo.plugins.solr, {'path': 'description', 'commit': true});
         Globals.modelb = Globals.mongoose.model('model19', Globals.schema19);
         return cb();
       }
@@ -920,6 +903,9 @@ exports['plugins'] = {
     , function(cb){
         return Globals.modelb.create({'description': 'Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune'}
                , Belt.cs(cb, Globals, 'doc_3', 1, 0));
+      }
+    , function(cb){
+        return setTimeout(cb, 5000);
       }
     , function(cb){
         return Globals.modelb.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
@@ -966,6 +952,9 @@ exports['plugins'] = {
       }
     , function(cb){
         return Globals.doc_a.remove(function(){ return setTimeout(cb, 1000); });
+      }
+    , function(cb){
+        return setTimeout(cb, 5000);
       }
     , function(cb){
         return Solrdex.getById(Globals.doc_a.get('_id'), Belt.cs(cb, Globals, 'solrdoc', 1, 0));
@@ -1173,10 +1162,12 @@ exports['plugins'] = {
       }
     , function(cb){
         Globals.schema26 = new Mongoose.Schema({'description': String});
-        Globals.schema26.plugin(Mongoo.plugins.solr, {'path': 'description', 'model_name': 'model27_file_description'});
+        Globals.schema26.plugin(Mongoo.plugins.solr, {'path': 'description', 'model_name': 'model27_file_description'
+                                                     , 'commit': true});
         Globals.schema27 = new Mongoose.Schema({'files': [Globals.schema26]});
         Globals.schema27.plugin(Mongoo.plugins.solr, {'search_only': true, 'model_name': 'model27_file_description'
-                                                     , 'id_path': 'files._id', 'path': 'description', 'subdoc_path': 'files'});
+                                                     , 'id_path': 'files._id', 'path': 'description', 'subdoc_path': 'files'
+                                                     , 'commit': true});
         Globals.modelb = Globals.mongoose.model('model27', Globals.schema27);
         return cb();
       }
@@ -1192,6 +1183,9 @@ exports['plugins'] = {
     , function(cb){
         return Globals.modelb.create({'files': [{'description': 'Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune'}]}
                , Belt.cs(cb, Globals, 'doc_3', 1, 0));
+      }
+    , function(cb){
+        return setTimeout(cb, 5000);
       }
     , function(cb){
         return Globals.modelb.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
