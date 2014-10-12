@@ -20,6 +20,7 @@ Currently includes the following plugins:
 * **min_max** - add validator to ensure one numeric path is lte another
 * **require_together** - add validator to require several paths to be set, if any of them are set
 * **set_predicate** - expands on Mongoose's array operators, providing atomic array operations using iterators
+* **set_save** - update path(s) and save with all validations
 * **url_path** - validate that a path is a valid URL
 * **email_path** - validate that a path is a valid email
 * **phone_path** - validate that a path is a valid phone number
@@ -28,6 +29,7 @@ Currently includes the following plugins:
 * **solr** - combines with [solrdex](https://github.com/sackio/solrdex) to add blazing-fast and powerful Solr full-text searching to any Mongoose model.
 * **schedule** - represents a chronological schedule and all the fun validations that entails (still in progress)
 * **access_control** - combines with [rol](https://github.com/sackio/rol) to provide powerful access control and scoping for models and their documents -- drop this in to create an instant API
+* **payment** - combines with [pa1d](https://github.com/sackio/pa1d) to provide payment processing in Mongoose. Create payment accounts and store payment methods using common payment gateways, then perform transactions, keeping records in Mongo.
 
 Utilities include:
 
