@@ -1378,6 +1378,66 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        Globals.schema33 = new Mongoose.Schema({'description': String});
+        Globals.schema33.plugin(Mongoo.plugins.payment.sale, {'path': 'gateway', 'braintree': O.braintree
+                                                             , 'customer_model': 'model32'
+                                                             , 'customer_payment_account_path': 'payment_account'});
+        Globals.model2 = Globals.mongoose.model('model33', Globals.schema33);
+        return cb();
+      }
+    , function(cb){
+        Globals.model2.create({
+          'description': 'payment without a customer'
+        , 'gateway': {
+            'amount': 55.55
+          , 'paymentMethodNonce': Paid._provider.testing.Nonces.Transactable
+          }
+        }, Belt.cs(cb, gb, 'doc2', 1, 0));
+      }
+    , function(cb){
+        test.ok(gb.doc2.get('gateway.status') === 'submitted_for_settlement');
+        test.ok(gb.doc2.get('gateway.amount') === '55.55');
+        test.ok(gb.doc2.get('gateway.customer.id'));
+        return cb();
+      }
+    , function(cb){
+        return gb.doc2.delete_sale(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(gb.doc2.get('gateway.status') === 'voided');
+        return cb();
+      }
+    , function(cb){
+        Globals.model.create({
+          'name': 'John Doe'
+        , 'payment_account': {
+            'account': {
+              'paymentMethodNonce': Paid._provider.testing.Nonces.Transactable
+            }
+          }
+        }, Belt.cs(cb, gb, 'doc', 1, 0));
+      }
+    , function(cb){
+        Globals.model2.create({
+          'gateway': { 
+            'amount': Belt.random_int(19, 43)
+          , 'customerId': gb.doc.get('payment_account.token')
+          , 'paymentMethodNonce': Paid._provider.testing.Nonces.PayPalFuturePayment
+          }
+        }, Belt.cs(cb, gb, 'doc2', 1, 0));
+      }
+    , function(cb){
+        test.ok(gb.doc2.get('gateway.customer.id') === gb.doc.get('payment_account.token'));
+        return cb();
+      }
+    , function(cb){
+        return gb.doc.get_customer(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        test.ok(gb.doc.get('payment_account.account.paypalAccounts.0'));
+        return cb();
+      }
+    , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
     , function(cb){
