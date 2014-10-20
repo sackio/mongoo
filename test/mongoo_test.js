@@ -1438,6 +1438,62 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        Globals.schema34 = new Mongoose.Schema({
+          'username': {type: String}
+        , 'name': {type: String}
+        , 'profile_picture': {type: String}
+        , 'instagram_id': {type: String}
+        , 'instagram_api_token': {type: String}
+        , 'activation_token': {type: String}
+        });
+        Globals.schema34.plugin(Mongoo.plugins.set_save);
+        Globals.model = Globals.mongoose.model('model34', Globals.schema34);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'name': 'John Doe'}, Belt.cs(cb, gb, 'doc', 1, 0));
+      }
+    , function(cb){
+        gb.set = {
+          'username': Belt.uuid()
+        , 'profile_picture': Belt.uuid()
+        , 'instagram_id': Belt.uuid()
+        , 'instagram_api_token': Belt.uuid()
+        };
+        return Globals.model.setSave(gb.doc.get('_id'), gb.set, Belt.cs(cb, gb, 'udoc', 1, 0));
+      }
+    , function(cb){
+        _.each(gb.set, function(v, k){
+          return test.ok(Belt.deepEqual(v, gb.udoc.get(k)));
+        });
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'name': 'John Doe'}, Belt.cs(cb, gb, 'doc2', 1, 0));
+      }
+    , function(cb){
+        gb.set = [{
+          'username': Belt.uuid()
+        , 'profile_picture': Belt.uuid()
+        , 'instagram_id': Belt.uuid()
+        , 'instagram_api_token': Belt.uuid()
+        }, {
+          'username': Belt.uuid()
+        , 'profile_picture': Belt.uuid()
+        , 'instagram_id': Belt.uuid()
+        , 'instagram_api_token': Belt.uuid()
+        }];
+        return Globals.model.setSave([gb.doc.get('_id'), gb.doc2.get('_id')], gb.set, Belt.cs(cb, gb, 'docs', 1, 0));
+      }
+    , function(cb){
+        _.each(gb.docs, function(d, i){
+          return _.each(gb.set[i], function(v, k){
+            return test.ok(Belt.deepEqual(v, d.get(k)));
+          });
+        });
+        return cb();
+      }
+    , function(cb){
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
     , function(cb){
