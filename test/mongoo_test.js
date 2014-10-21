@@ -438,6 +438,60 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        Globals.schema____11 = new Mongoose.Schema({
+          'tags': Array
+        });
+        Globals.schema____11.plugin(Mongoo.plugins.set_predicate);
+        Globals.schema____11.validate_set_dupes('tags', null, {'sparse': true});
+        Globals.model = Globals.mongoose.model('model____11', Globals.schema____11);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'tags': ['orange', 'apple', 'orange']}, function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'tags': ['orange', null, null]}, function(err){
+          test.ok(!err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'tags': ['orange', undefined, undefined]}, function(err){
+          test.ok(!err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'tags': ['orange', false, false]}, function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        Globals.schema_____11 = new Mongoose.Schema({
+          'tags': [{'label': String, 'count': Number}]
+        });
+        Globals.schema_____11.plugin(Mongoo.plugins.set_predicate);
+        Globals.schema_____11.validate_set_dupes('tags', 'label', {'sparse': true});
+        Globals.model = Globals.mongoose.model('model_____11', Globals.schema_____11);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'tags': [{label: null, count: 9}, {label: null, count: 3}]}, function(err){
+          test.ok(!err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'tags':  [{label: 'orange', count: 9}, {label: 'orange', count: 4}]}, function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
         Globals.schema12 = new Mongoose.Schema({});
         Globals.schema12.plugin(Mongoo.plugins.url_path, {'path': 'url', 'required': true});
         Globals.model = Globals.mongoose.model('model12', Globals.schema12);
