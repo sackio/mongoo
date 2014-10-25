@@ -1,7 +1,7 @@
 {
   "name": "mongoo",
   "description": "A collection of essential plugins and utilities for working with MongoDB and Mongoose",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/sackio/mongoo",
   "author": {
     "name": "Ben Sack",
