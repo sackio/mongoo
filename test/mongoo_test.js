@@ -15,6 +15,7 @@ var Mongoo = require('../lib/mongoo.js')
   , Solrdex = new require('solrdex')({'commit': true})
   , Paid = new require('pa1d')(O)
   , Seme = new require('seme')(O)
+  , Colors = require('colors')
 ;
 
 var Globals = {
@@ -30,6 +31,8 @@ exports['plugins'] = {
 , 'plugins': function(test){
     return Async.waterfall([
       function(cb){
+        console.log('TEST: encrypt_path'.bold.blue);
+
         Globals.schema = new Mongoose.Schema({
           'label': String
         });
@@ -51,6 +54,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: encrypt_path - changing password'.bold.blue);
+
         Globals.doc.set('plaintext_password', 'changing the password');
         return Globals.doc.save(Belt.cw(cb, 0));
       }
@@ -75,6 +80,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: encrypt_path - required'.bold.blue);
+
         Globals.schema2 = new Mongoose.Schema({
           'label': String
         });
@@ -92,6 +99,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: confirm_path'.bold.blue);
+
         Globals.schema3 = new Mongoose.Schema({
           'label': String
         });
@@ -136,6 +145,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: virtual_path'.bold.blue);
+
         Globals.schema4 = new Mongoose.Schema({
           'label': String
         });
@@ -170,6 +181,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: timestamps'.bold.blue);
+
         Globals.schema5 = new Mongoose.Schema({
           'label': String
         });
@@ -210,6 +223,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: path_token'.bold.blue);
+
         Globals.schema6 = new Mongoose.Schema({
           'label': String
         });
@@ -268,6 +283,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: require_together'.bold.blue);
+
         Globals.schema8 = new Mongoose.Schema({
           'label': String
         , 'name': String
@@ -292,6 +309,54 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: require_together - if paths'.bold.blue);
+
+        Globals.schema_8 = new Mongoose.Schema({
+          'label': String
+        , 'name': String
+        });
+        Globals.schema_8.plugin(Mongoo.plugins.require_together, {'paths': 'label', 'if_paths': 'name'});
+        Globals.model = Globals.mongoose.model('model_8', Globals.schema_8);
+        return cb();
+      }
+    , function(cb){
+        console.log('TEST: require_together - if paths'.bold.blue);
+
+        Globals.schema__8 = new Mongoose.Schema({
+          'label': [String]
+        , 'name': String
+        });
+        Globals.schema__8.plugin(Mongoo.plugins.require_together, {'paths': 'label.1', 'if_paths': 'name'});
+        Globals.model = Globals.mongoose.model('model__8', Globals.schema__8);
+        return cb();
+      }
+    , function(cb){
+        return Globals.model.create({'label': ['anewtest'], 'name': null}, function(err){
+          test.ok(!err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'label': ['test', 'done'], 'name': 'Bill'}, function(err){
+          test.ok(!err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'label': null, 'name': 'Ben'}, function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'label': [1], 'name': 'Ben'}, function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        console.log('TEST: start_end'.bold.blue);
+
         Globals.schema9 = new Mongoose.Schema({
           'start': Date
         , 'stop': Date
@@ -326,6 +391,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: min_max'.bold.blue);
+
         Globals.schema10 = new Mongoose.Schema({
           'start': Number
         , 'stop': Number
@@ -353,6 +420,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: set_predicate'.bold.blue);
+
         Globals.schema11 = new Mongoose.Schema({
           'tags': Array
         });
@@ -382,6 +451,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: set_predicate - dupes'.bold.blue);
+
         Globals.schema_11 = new Mongoose.Schema({
           'tags': [String]
         });
@@ -499,6 +570,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: url_path'.bold.blue);
+
         Globals.schema12 = new Mongoose.Schema({});
         Globals.schema12.plugin(Mongoo.plugins.url_path, {'path': 'url', 'required': true});
         Globals.model = Globals.mongoose.model('model12', Globals.schema12);
@@ -526,6 +599,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: email_path & phone_path'.bold.blue);
+
         Globals.schema13 = new Mongoose.Schema({});
         Globals.schema13.plugin(Mongoo.plugins.email_path, {'path': 'email'});
         Globals.schema13.plugin(Mongoo.plugins.phone_path, {'path': 'phone'});
@@ -579,6 +654,8 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }
     , function(cb){
+        console.log('TEST: location_path'.bold.blue);
+
         Globals.schema14 = new Mongoose.Schema({});
         Globals.schema14.plugin(Mongoo.plugins.location_path, {'path': 'location', 'api_key': O.google.server_api_key});
         Globals.model = Globals.mongoose.model('model14', Globals.schema14);
@@ -667,6 +744,26 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: location_path - invalid address'.bold.blue);
+
+        return Globals.model.create({'location': {'given_string': 'totally not an address'}}, function(err, doc){
+          test.ok(err);
+          test.ok(!doc);
+
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({'location': {'geo': {'type': 'Point', 'coordinates': [-77.036530, 38.897676]}}, 'location_no_geocode': true}, function(err, doc){
+          test.ok(!err);
+          test.ok(doc);
+          test.ok(!doc.get('location.normalized_string'));
+          test.ok(doc.get('location.geo.coordinates.1'));
+
+          return cb();
+        });
+      }
+    , function(cb){
         Globals.schema15 = new Mongoose.Schema({});
         Globals.schema15.plugin(Mongoo.plugins.location_path, {'path': 'location', 'api_key': O.google.server_api_key, 'array': true});
         Globals.model = Globals.mongoose.model('model15', Globals.schema15);
@@ -741,6 +838,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: file_path'.bold.blue);
+
         Globals.schema16 = new Mongoose.Schema({});
         Globals.schema16.plugin(Mongoo.plugins.file_path, {'path': 'image'});
         Globals.model = Globals.mongoose.model('model16', Globals.schema16);
@@ -757,6 +856,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: file_path - 1'.bold.blue);
+
         Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
         return Globals.model.create({image: {file_path: Globals.path}}
                , Belt.cs(cb, Globals, 'doc', 1, 0));
@@ -770,6 +871,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 2'.bold.blue);
+
         return Globals.doc.remove(Belt.cw(function(err){ return setTimeout(cb, 3000); }, 0));
       }
     , function(cb){
@@ -779,11 +882,15 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 3'.bold.blue);
+
         Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
         return Globals.model.create({image: {file_path: Globals.path}}
                , Belt.cs(cb, Globals, 'doc', 1, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 4'.bold.blue);
+
         return Globals.doc.watch_file('image', Belt.cw(cb, 0));
       }
     , function(cb){
@@ -806,6 +913,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 5'.bold.blue);
+
         test.ok(!Belt.deepEqual(Globals.stat, Globals.doc.get('image.stat')));
         Globals.stat = Belt.deepCopy(Globals.doc.get('image.stat'));
         Globals.doc.get('image.stat').isFile = false;
@@ -817,6 +926,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: file_path - 6'.bold.blue);
+
         Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
         Globals.doc.set('image.file_path', Globals.path);
         return Globals.doc.save(Belt.cw(cb, 0));
@@ -830,6 +941,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 7'.bold.blue);
+
         Globals.stat = Belt.deepCopy(Globals.doc.get('image.stat'));
         return Globals.doc.update_ftimes('image', function(err){
           test.ok(!err);
@@ -842,6 +955,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 8'.bold.blue);
+
         Globals.path = Path.join(OS.tmpdir(), '/' + Belt.uuid());
         return Globals.doc.set_file('image', Globals.path, Belt.cw(cb, 0));
       }
@@ -854,6 +969,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 9'.bold.blue);
+
         Globals.schema17 = new Mongoose.Schema({});
         Globals.schema17.plugin(Mongoo.plugins.file_path, {'path': 'images', 'array': true});
         Globals.model = Globals.mongoose.model('model17', Globals.schema17);
@@ -869,6 +986,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: file_path - 10'.bold.blue);
+
         Globals.paths = [
           Path.join(OS.tmpdir(), '/' + Belt.uuid())
         , Path.join(OS.tmpdir(), '/' + Belt.uuid())
@@ -880,6 +999,8 @@ exports['plugins'] = {
                , Belt.cs(cb, Globals, 'doc', 1, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 11'.bold.blue);
+
         var index = 0;
 
         return Async.eachSeries(Globals.paths, function(p, _cb){
@@ -893,6 +1014,8 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 12'.bold.blue);
+
         var index = 0;
         return Async.eachSeries(Globals.paths, function(p, _cb){
           index++;
@@ -900,6 +1023,8 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 13'.bold.blue);
+
         var index = 0;
         return Async.eachSeries(Globals.paths, function(p, _cb){
           index++;
@@ -915,6 +1040,8 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 14'.bold.blue);
+
         var index = 0;
         return Async.eachSeries(Globals.paths, function(p, _cb){
           index++;
@@ -938,6 +1065,8 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 15'.bold.blue);
+
         var index = 0;
         return Async.eachSeries(Globals.paths, function(p, _cb){
           index++;
@@ -955,6 +1084,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: file_path - 16'.bold.blue);
+
         var index = 0;
         return Async.eachSeries(Globals.paths, function(p, _cb){
           index++;
@@ -970,10 +1101,14 @@ exports['plugins'] = {
           });
         });
       }
-    , function(cb){
+    /*, function(cb){
+        console.log('TEST: file_path - 17'.bold.blue);
+
         return Globals.doc.remove(Belt.cw(function(err){ return setTimeout(cb, 3000); }, 0));
       }
     , function(cb){
+        console.log('TEST: file_path - 18'.bold.blue);
+
         var index = 0;
         return Async.eachSeries(Globals.paths, function(p, _cb){
           index++;
@@ -982,12 +1117,14 @@ exports['plugins'] = {
             return _cb();
           });
         }, Belt.cw(cb, 0));
-      }
+      }*/
     , function(cb){
         return Mongoo.utils.clearSolr(Belt.cw(cb, 0));
         //return Solrdex.delete('*', Belt.cw(cb, 0));
       }
     , function(cb){
+        console.log('TEST: solr'.bold.blue);
+
         Globals.schema18 = new Mongoose.Schema({'description': String});
         Globals.schema18.plugin(Mongoo.plugins.solr, {'path': 'description'});
         Globals.model = Globals.mongoose.model('model18', Globals.schema18);
@@ -1019,8 +1156,8 @@ exports['plugins'] = {
         return Globals.model.solrSearch('wurst bezt slings', Belt.cs(cb, Globals, 'results', 1, 0));
       }
     , function(cb){
-        //test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_a.get('_id')));
-        //test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_c.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_a.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_c.get('_id')));
         return cb();
       }
     , function(cb){
@@ -1048,7 +1185,7 @@ exports['plugins'] = {
         return Globals.modelb.solrSearch('worst times', Belt.cs(cb, Globals, 'results', 1, 0));
       }
     , function(cb){
-        //test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
         test.ok(Globals.results.length === 1);
         return cb();
       }
@@ -1056,8 +1193,8 @@ exports['plugins'] = {
         return Globals.modelb.solrSearch('wurst bezt slings', Belt.cs(cb, Globals, 'results', 1, 0));
       }
     , function(cb){
-        //test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
-        //test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_3.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[0]._id,Globals.doc_1.get('_id')));
+        test.ok(Belt.deepEqual(Globals.results[1]._id,Globals.doc_3.get('_id')));
         test.ok(Globals.results.length === 2);
         return cb();
       }
@@ -1101,6 +1238,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: access_control'.bold.blue);
+
         Globals.schema20 = new Mongoose.Schema({'description': String});
         Globals.schema20.plugin(Mongoo.plugins.access_control);
         Globals.model = Globals.mongoose.model('model20', Globals.schema20);
@@ -1154,12 +1293,16 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: access_control - mediator'.bold.blue);
+
         Globals.interface = Globals.doc.mediator();
 
         test.ok(Globals.interface.get('password') === 'gonzo');
         return cb();
       }
     , function(cb){
+        console.log('TEST: nested schemas and arrays'.bold.blue);
+
         Globals.schema21 = new Mongoose.Schema({
           'links': [{'label': String, 'url': {type: String, required: true}}]
         });
@@ -1298,6 +1441,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: solr - nested schema'.bold.blue);
+
         Globals.schema26 = new Mongoose.Schema({'description': String});
         Globals.schema26.plugin(Mongoo.plugins.solr, {'path': 'description', 'model_name': 'model27_file_description'
                                                      , 'commit': true});
@@ -1388,6 +1533,8 @@ exports['plugins'] = {
         });
       }
     , function(cb){
+        console.log('TEST: payment_account'.bold.blue);
+
         Globals.schema32 = new Mongoose.Schema({'name': String});
         Globals.schema32.plugin(Mongoo.plugins.payment.account, {'path': 'payment_account', 'braintree': O.braintree});
         Globals.model = Globals.mongoose.model('model32', Globals.schema32);
@@ -1450,6 +1597,53 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: payment_account - invalid'.bold.blue);
+
+        return Globals.model.create({
+          'name': 'John Doe'
+        , 'payment_account': {
+            'account': {
+              'paymentMethodNonce': Paid._provider.testing.Nonces.Consumed
+            }
+          }
+        }, function(err, doc){
+          test.ok(err);
+          test.ok(!doc);
+          return cb();
+        });
+      }
+    , function(cb){
+        return Globals.model.create({
+          'name': 'John Doe'
+        , 'payment_account': {
+            'account': {
+              'paymentMethodNonce': 'not real at all'
+            }
+          }
+        }, function(err, doc){
+          test.ok(err);
+          test.ok(!doc);
+          return cb();
+        });
+      }
+    , function(cb){
+
+        return Globals.model.create({
+          'name': 'John Doe'
+        , 'payment_account': {
+            'account': {
+
+            }
+          }
+        }, function(err, doc){
+          test.ok(!err);
+          test.ok(doc);
+          return cb();
+        });
+      }
+    , function(cb){
+        console.log('TEST: payment_account - sale'.bold.blue);
+
         Globals.schema33 = new Mongoose.Schema({'description': String});
         Globals.schema33.plugin(Mongoo.plugins.payment.sale, {'path': 'gateway', 'braintree': O.braintree
                                                              , 'customer_model': 'model32'
@@ -1510,6 +1704,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: set_save'.bold.blue);
+
         Globals.schema34 = new Mongoose.Schema({
           'username': {type: String}
         , 'name': {type: String}
@@ -1566,6 +1762,8 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: clearing models'.bold.blue);
+
         return Mongoo.utils.clearModels(Globals.mongoose, Belt.cw(cb, 0));
       }
     , function(cb){
@@ -1583,6 +1781,13 @@ exports['plugins'] = {
         return cb();
       }
     , function(cb){
+        console.log('TEST: clearing solr'.bold.blue);
+
+        return Mongoo.utils.clearSolr(Belt.cw(cb, 0));
+      }
+    , function(cb){
+        console.log('TEST: dropping database'.bold.blue);
+
         return Mongoo.utils.dropDB(O.mongodb.db, O.mongodb, Belt.cw(cb, 0));
       }
     ], function(err){

@@ -1,7 +1,7 @@
 {
   "name": "mongoo",
   "description": "A collection of essential plugins and utilities for working with MongoDB and Mongoose",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage": "https://github.com/sackio/mongoo",
   "author": {
     "name": "Ben Sack",
@@ -50,6 +50,7 @@
   , "mongodb": "*"
   , "pa1d": "*"
   , "seme": "git://github.com/sackio/seme.git#master"
+  , "colors": "*"
   },
   "keywords": []
 }
