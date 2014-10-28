@@ -672,18 +672,19 @@ exports['plugins'] = {
           return cb();
         });
       }
-    , function(cb){
+    /*, function(cb){
         return Globals.model.create({'location': {'given_string': 'Eiffel Tower'}}, function(err, doc){
           test.ok(!err);
 
           //test.ok(doc.get('location.normalized_string') === 'Eiffel Tower, Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France');
+
           test.ok(doc.get('location.geo.coordinates').length === 2);
           test.ok(doc.get('location.address.city') === 'Paris');
           test.ok(doc.get('location.address.point_of_interest') === 'Eiffel Tower');
 
           return cb();
         });
-      }
+      }*/
     , function(cb){
         return Globals.model.create({'location': {'geo': {'type': 'Point', 'coordinates': [-77.036530, 38.897676]}}}, function(err, doc){
           test.ok(!err);
@@ -786,9 +787,9 @@ exports['plugins'] = {
         test.ok(doc.get('location.0.address.zip') === '20500');
         test.ok(doc.normalize_address('location.0') === '1600, Pennsylvania Avenue Northwest, Washington, District of Columbia, United States, 20500');
         //test.ok(doc.get('location.1.normalized_string') === 'Eiffel Tower, Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France');
-        test.ok(doc.get('location.1.geo.coordinates').length === 2);
-        test.ok(doc.get('location.1.address.city') === 'Paris');
-        test.ok(doc.get('location.1.address.point_of_interest') === 'Eiffel Tower');
+        //test.ok(doc.get('location.1.geo.coordinates').length === 2);
+        //test.ok(doc.get('location.1.address.city') === 'Paris');
+        //test.ok(doc.get('location.1.address.point_of_interest') === 'Eiffel Tower');
         test.ok(doc.get('location.2.normalized_string') === '50 Park Avenue, New York, NY 10016, USA');
 
         return cb();
