@@ -228,7 +228,7 @@ exports['plugins'] = {
         Globals.schema6 = new Mongoose.Schema({
           'label': String
         });
-        Globals.schema6.plugin(Mongoo.plugins.path_token, {'path': 'label'});
+        Globals.schema6.plugin(Mongoo.plugins.path_token, {'path': 'label', 'expires': 302000});
         Globals.model = Globals.mongoose.model('model6', Globals.schema6);
         return cb();
       }
@@ -253,6 +253,70 @@ exports['plugins'] = {
         return Globals.doc.save(function(err, doc){
           test.ok(!err);
           test.ok(Globals.token !== doc.get('label_token.token'));
+          gb.doc = doc;
+          return cb();
+        });
+      }
+    , function(cb){
+        gb.doc.create_label_token();
+        gb.token = gb.doc.get('label_token.token');
+        gb.expires = gb.doc.get('label_token.expires_at');
+        test.ok(gb.token);
+        test.ok(gb.expires);
+
+        gb.doc.create_label_token();
+        gb.token2 = gb.doc.get('label_token.token');
+        gb.expires2 = gb.doc.get('label_token.expires_at');
+        test.ok(gb.token2);
+        test.ok(gb.expires2);
+        test.ok(gb.token !== gb.token2);
+        test.ok(gb.expires !== gb.token2);
+
+        gb.doc.set('label', 'new value');
+        gb.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        gb.doc.set('label_token_confirmation', gb.token);
+        gb.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        gb.doc.set('label_token_confirmation', gb.token2);
+        gb.doc.save(function(err, doc){
+          test.ok(!err);
+          gb.doc = doc;
+
+          gb.token3 = gb.doc.get('label_token.token');
+          gb.expires3 = gb.doc.get('label_token.expires_at');
+
+          test.ok(gb.token2 !== gb.token3);
+          test.ok(gb.expires2 !== gb.expires3);
+
+          return cb();
+        });
+      }
+    , function(cb){
+        gb.doc.set('label_token.expires_at', Moment().subtract(1, 'years').toDate());
+        gb.doc.set('label_token_confirmation', gb.token3);
+        gb.doc.set('label', 'yet another new value');
+
+        gb.doc.save(function(err){
+          test.ok(err);
+          return cb();
+        });
+      }
+    , function(cb){
+        gb.doc.set('label_token.expires_at', Moment().add(2, 'years').toDate());
+        gb.doc.set('label_token_confirmation', gb.doc.get('label_token.token'));
+        gb.doc.set('label', 'yet still another new value');
+
+        gb.doc.save(function(err){
+          test.ok(!err);
           return cb();
         });
       }
@@ -278,7 +342,7 @@ exports['plugins'] = {
         Globals.doc2.set('label', 'somethingnew');
         Globals.doc2.set('label_token_confirmation', Globals.doc2.get('label_token.token'));
         return Globals.doc2.save(function(err, doc){
-          test.ok(!err);
+          test.ok(err);
           return cb();
         });
       }
