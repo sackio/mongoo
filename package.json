@@ -1,7 +1,7 @@
 {
   "name": "mongoo",
   "description": "A collection of essential plugins and utilities for working with MongoDB and Mongoose",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage": "https://github.com/sackio/mongoo",
   "author": {
     "name": "Ben Sack",
@@ -32,6 +32,9 @@
     "grunt-contrib-nodeunit": "~0.2.0",
     "grunt-contrib-watch": "~0.5.3",
     "grunt": "~0.4.5"
+  , "seme": "git://github.com/sackio/seme.git#master"
+  , "colors": "*"
+  , "winston": "*"
   },
   "dependencies": {
     "mongoose": "3.8.15"
@@ -49,8 +52,6 @@
   , "timely": "*"
   , "mongodb": "*"
   , "pa1d": "*"
-  , "seme": "git://github.com/sackio/seme.git#master"
-  , "colors": "*"
   },
   "keywords": []
 }

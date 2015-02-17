@@ -16,16 +16,22 @@ var Mongoo = require('../lib/mongoo.js')
   , Paid = new require('pa1d')(O)
   , Seme = new require('seme')(O)
   , Colors = require('colors')
+  , Winston = require('winston')
 ;
 
 var Globals = {
   'mongo_connection': Util.format('mongodb://%s:%s/%s', O.mongodb.host, O.mongodb.port, O.mongodb.db)
 }
-  , gb = Globals;
+  , gb = Globals
+  , log = new Winston.Logger()
+;
+
+log.add(Winston.transports.Console, {'level': 'debug', 'colorize': true, 'timestamp': false});
+
+Globals.mongoose = Mongoose.createConnection(Globals.mongo_connection);
 
 exports['plugins'] = {
   'setUp': function(done){
-    Globals.mongoose = Mongoose.createConnection(Globals.mongo_connection);
     done();
   }
 , 'plugins': function(test){
@@ -1939,19 +1945,70 @@ exports['plugins'] = {
         test.ok(!_.any(Globals.docs));
         return cb();
       }
-    , function(cb){
-        console.log('TEST: clearing solr'.bold.blue);
-
-        return Mongoo.utils.clearSolr(Belt.cw(cb, 0));
-      }
-    , function(cb){
-        console.log('TEST: dropping database'.bold.blue);
-
-        return Mongoo.utils.dropDB(O.mongodb.db, O.mongodb, Belt.cw(cb, 0));
-      }
     ], function(err){
       if (err) console.error(err);
       test.ok(!err);
+      return test.done();
+    });
+  }
+, 'file_path - prev_path': function(test){
+    var test_name = 'file_path - prev_path';
+    log.debug(test_name);
+    log.profile(test_name);
+
+    return Async.waterfall([
+      function(cb){
+        gb.schema = new Mongoose.Schema({});
+        gb.schema.plugin(Mongoo.plugins.file_path, {'path': 'file'});
+        gb.model = gb.mongoose.model('file-path-prev', gb.schema);
+        return cb();
+      }
+    , function(cb){
+        Seme.generators.data.getImageFile({'topic': 'sushi'}, Belt.cs(cb, gb, 'img', 1, 0));
+      }
+    , function(cb){
+        test.ok(FSTK._fs.existsSync(gb.img.path));
+        return cb();
+      }
+    , function(cb){
+        gb.newp = FSTK.tempfile();
+        return gb.model.create({'file_prev_path': gb.img.path,'file': {'file_path': gb.newp}}, Belt.cs(cb, gb, 'doc', 1, 0));
+      }
+    , function(cb){
+        test.ok(gb.doc.get('file.file_path') === gb.newp);
+        test.ok(!gb.doc.get('file_prev_path'));
+        test.ok(!FSTK._fs.existsSync(gb.img.path));
+        test.ok(FSTK._fs.existsSync(gb.newp));
+
+        return cb();
+      }
+    ], function(err){
+      test.ok(!err);
+      log.profile(test_name);
+      return test.done();
+    });
+  }
+, 'clear solr': function(test){
+    var test_name = 'clear solr';
+    log.debug(test_name);
+    log.profile(test_name);
+
+    return Mongoo.utils.clearSolr(function(err){
+      test.ok(!err);
+
+      log.profile(test_name);
+      return test.done();
+    });
+  }
+, 'drop database': function(test){
+    var test_name = 'drop database';
+    log.debug(test_name);
+    log.profile(test_name);
+
+    return Mongoo.utils.dropDB(O.mongodb.db, O.mongodb, function(err){
+      test.ok(!err);
+
+      log.profile(test_name);
       return test.done();
     });
   }
