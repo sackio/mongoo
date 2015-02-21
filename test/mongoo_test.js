@@ -12,7 +12,7 @@ var Mongoo = require('../lib/mongoo.js')
   , _ = require('underscore')
   , Optionall = require('optionall')
   , O = new Optionall(Path.resolve('./'))
-  , Solrdex = new require('solrdex')({'commit': true})
+  , Solrdex = new require('solrdex')(O)
   , Paid = new require('pa1d')(O)
   , Seme = new require('seme')(O)
   , Colors = require('colors')
@@ -1194,14 +1194,14 @@ exports['plugins'] = {
         }, Belt.cw(cb, 0));
       }*/
     , function(cb){
-        return Mongoo.utils.clearSolr(Belt.cw(cb, 0));
+        return Mongoo.utils.clearSolr(O.solr, Belt.cw(cb, 0));
         //return Solrdex.delete('*', Belt.cw(cb, 0));
       }
     , function(cb){
         console.log('TEST: solr'.bold.blue);
 
         Globals.schema18 = new Mongoose.Schema({'description': String});
-        Globals.schema18.plugin(Mongoo.plugins.solr, {'path': 'description'});
+        Globals.schema18.plugin(Mongoo.plugins.solr, {'path': 'description', 'solr_client': Solrdex});
         Globals.model = Globals.mongoose.model('model18', Globals.schema18);
         return cb();
       }
@@ -1237,7 +1237,7 @@ exports['plugins'] = {
       }
     , function(cb){
         Globals.schema19 = new Mongoose.Schema({'description': String});
-        Globals.schema19.plugin(Mongoo.plugins.solr, {'path': 'description', 'commit': true});
+        Globals.schema19.plugin(Mongoo.plugins.solr, {'path': 'description', 'commit': true, 'solr_client': Solrdex});
         Globals.modelb = Globals.mongoose.model('model19', Globals.schema19);
         return cb();
       }
@@ -1520,11 +1520,11 @@ exports['plugins'] = {
 
         Globals.schema26 = new Mongoose.Schema({'description': String});
         Globals.schema26.plugin(Mongoo.plugins.solr, {'path': 'description', 'model_name': 'model27_file_description'
-                                                     , 'commit': true});
+                                                     , 'commit': true, 'solr_client': Solrdex});
         Globals.schema27 = new Mongoose.Schema({'files': [Globals.schema26]});
         Globals.schema27.plugin(Mongoo.plugins.solr, {'search_only': true, 'model_name': 'model27_file_description'
                                                      , 'id_path': 'files._id', 'path': 'description', 'subdoc_path': 'files'
-                                                     , 'commit': true});
+                                                     , 'commit': true, 'solr_client': Solrdex});
         Globals.modelb = Globals.mongoose.model('model27', Globals.schema27);
         return cb();
       }
@@ -1993,7 +1993,7 @@ exports['plugins'] = {
     log.debug(test_name);
     log.profile(test_name);
 
-    return Mongoo.utils.clearSolr(function(err){
+    return Mongoo.utils.clearSolr(O.solr, function(err){
       test.ok(!err);
 
       log.profile(test_name);
