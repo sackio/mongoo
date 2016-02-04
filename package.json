@@ -37,7 +37,7 @@
   , "winston": "*"
   },
   "dependencies": {
-    "mongoose": "3.8.15"
+    "mongoose": "4.*"
   , "underscore": "*"
   , "async": "*"
   , "jsbelt": "*"
