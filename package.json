@@ -44,7 +44,7 @@
   , "fstk": "*"
   , "optionall": "*"
   , "moment": "*"
-  , "bcrypt": "*"
+  , "bcrypt": "1.*"
   , "solrdex": "*"
   , "request": "*"
   , "locup": "*"
